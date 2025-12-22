@@ -1,0 +1,38 @@
+{
+  "ver": "1.2.0",
+  "importer": "directory",
+  "imported": true,
+  "uuid": "53b79cf4-f089-41f9-ab7f-0188e5ae3d7e",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "isBundle": true,
+    "bundleConfigID": "default",
+    "bundleName": "resources",
+    "priority": 8,
+    "bundleFilterConfig": [
+      {
+        "range": "exclude",
+        "type": "url",
+        "patchOption": {
+          "patchType": "glob",
+          "value": "db://assets/*.test"
+        },
+        "assets": [
+          ""
+        ]
+      },
+      {
+        "range": "include",
+        "type": "url",
+        "patchOption": {
+          "patchType": "glob",
+          "value": "db://assets/resources/**/*"
+        },
+        "assets": [
+          ""
+        ]
+      }
+    ]
+  }
+}

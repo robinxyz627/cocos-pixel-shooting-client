@@ -1,0 +1,20 @@
+
+skeleton.png
+size: 848,661
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+11
+  rotate: false
+  xy: 688, 476
+  size: 158, 183
+  orig: 189, 183
+  offset: 14, 0
+  index: -1
+actorModel
+  rotate: true
+  xy: 2, 2
+  size: 657, 684
+  orig: 1024, 1024
+  offset: 129, 171
+  index: -1
