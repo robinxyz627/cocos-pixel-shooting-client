@@ -12,17 +12,6 @@
     "priority": 8,
     "bundleFilterConfig": [
       {
-        "range": "exclude",
-        "type": "url",
-        "patchOption": {
-          "patchType": "glob",
-          "value": "db://assets/*.test"
-        },
-        "assets": [
-          ""
-        ]
-      },
-      {
         "range": "include",
         "type": "url",
         "patchOption": {

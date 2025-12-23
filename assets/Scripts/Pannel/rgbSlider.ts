@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, Node, Slider, SliderComponent } from 'cc';
+import { _decorator, Color, Component, Node, Slider } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('rgbSlider')

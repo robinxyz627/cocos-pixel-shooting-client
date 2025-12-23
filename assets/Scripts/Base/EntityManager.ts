@@ -9,10 +9,17 @@ export abstract class EntityManager extends Component {
   private _state: EntityStateEnum;
 
   get state() {
+    //state依赖动画机，加判断
+    if (!this.fsm) {
+      return null;
+    }
     return this._state;
   }
 
   set state(newState) {
+    if (!this.fsm) {
+      return;
+    }
     this._state = newState;
     this.fsm.setParams(newState, true);
   }

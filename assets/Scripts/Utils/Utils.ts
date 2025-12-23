@@ -32,3 +32,8 @@ export const deepClone = (obj: any) => {
 export const fakeRandom = (seed:number)=>{
   return (seed * 9301 + 49297) % 233280;
 }
+
+//字符串全部小写
+export const toLowerCase = (str:string)=>{
+  return str.toLowerCase();
+}

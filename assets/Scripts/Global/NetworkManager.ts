@@ -24,6 +24,7 @@ export class NetworkManager extends Singleton {
     private map: Map<string, Array<IListenItem>> = new Map();
 
     isConnect: boolean = false;
+    intervalId: number = null;
     public async connect() {
         return new Promise((resolve, reject) => {
             if(this.isConnect){
@@ -53,12 +54,12 @@ export class NetworkManager extends Singleton {
             this.ws.onclose = () => {
                 this.isConnect = false;
                 console.log("close");
-                reject(false);
+                resolve(false);
             }
             this.ws.onerror = (e) => {
                 this.isConnect = false;
                 console.log("error", e);
-                reject(false);
+                resolve(false);
             }
         })
     }
@@ -109,6 +110,34 @@ export class NetworkManager extends Singleton {
         if(this.map.has(name)){
             const index = this.map.get(name).findIndex(i=>i.cb === cb && i.ctx === ctx);
             index > -1 && this.map.get(name).splice(index,1);
+        }
+    }
+
+    /**
+     * 创建周期性连接任务
+     * 默认5秒一次检测是否断开，若断开则重连
+     * @param interval 
+     */
+    public connectMissionStart(interval: number = 5000){
+        if(this.intervalId!== null) {
+            clearInterval(this.intervalId);
+        }
+        this.intervalId = setInterval(()=>{
+            if(!this.isConnect){
+                this.connect();
+            }
+        },interval) as unknown as number;
+    }
+
+        /**
+     * 去除周期性连接任务
+     * @param none
+     */
+    public connectMissionStop(){ 
+        //停止定时器
+        if(this.intervalId !== null){
+            clearInterval(this.intervalId);
+            this.intervalId = null;
         }
     }
 }

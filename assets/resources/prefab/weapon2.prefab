@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "weapon1",
+    "_name": "weapon2",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "weapon1",
+    "_name": "weapon2",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -87,8 +87,8 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -18.049999999999955,
-      "y": -6.5160000000000196,
+      "x": -32.92699999999991,
+      "y": -5.951000000000022,
       "z": 0
     },
     "_lrot": {
@@ -138,8 +138,8 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 0,
-      "y": 4,
+      "x": -15.819,
+      "y": 0.799,
       "z": 0
     },
     "_lrot": {
@@ -185,8 +185,8 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 50,
-      "y": 4,
+      "x": 70.338,
+      "y": 7.955,
       "z": 0
     },
     "_lrot": {
@@ -313,8 +313,8 @@
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0.358984375,
-      "y": 0.44909375
+      "x": 0.2427578125,
+      "y": 0.4535078125
     },
     "_id": ""
   },
@@ -345,7 +345,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "f815a77d-5654-4a6a-86ef-be8f1efaa95e@f9941",
+      "__uuid__": "d6c248fd-c31d-475f-948a-be099aca55d3@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,

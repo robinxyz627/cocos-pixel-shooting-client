@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, Node, SliderComponent, sp, SpriteComponent, SpriteFrame, UITransform, Vec3 } from 'cc';
+import { _decorator, Color, Component, Node, sp, SpriteComponent, SpriteFrame, UITransform, Vec3 } from 'cc';
 import { rgbSlider } from './rgbSlider';
 const { ccclass, property } = _decorator;
 
