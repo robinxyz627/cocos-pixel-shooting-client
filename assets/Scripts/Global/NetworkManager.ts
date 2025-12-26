@@ -18,8 +18,8 @@ export class NetworkManager extends Singleton {
         return super.GetInstance<NetworkManager>();
     }
 
-    port = 9876;
-    url = "ws://192.168.0.225";
+    //Nginx 有个默认行为：当请求一个 “目录路径” 但末尾不带斜杠时，会自动返回 301 重定向，要求客户端补全末尾斜杠（即把 /ws 重定向到 /ws/）
+    url = "ws://vinegarzhi.xyz/ws/";
     ws: WebSocket = null;
     private map: Map<string, Array<IListenItem>> = new Map();
 
@@ -31,7 +31,7 @@ export class NetworkManager extends Singleton {
                 resolve(true);
                 return;
             }
-            this.ws = new WebSocket(this.url+":"+this.port);
+            this.ws = new WebSocket(this.url);
             this.ws.onopen = () => {
                 this.isConnect = true;
                 console.log("open");

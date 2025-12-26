@@ -1,5 +1,5 @@
 import { _decorator, Component, LabelComponent, Node, SpriteComponent, SpriteFrame } from 'cc';
-import { IApiPlayerListRes, IPlayer } from '../Common/Api';
+import { IApiPlayerListRes, IPlayer, IPlayerListInfo } from '../Common/Api';
 const { ccclass, property } = _decorator;
 
 @ccclass('playerManager')
@@ -31,7 +31,7 @@ export class playerManager extends Component {
             console.log("playerManager:init:success");
         }
     }
-    updatePlayerSinglePannel(player: IPlayer) {
+    updatePlayerSinglePannel(player: IPlayerListInfo) {
         if (!this._isInit) {
             console.error("playerManager:updateName:error");
             return;

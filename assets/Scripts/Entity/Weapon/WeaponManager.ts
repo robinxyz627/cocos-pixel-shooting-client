@@ -44,6 +44,10 @@ export class WeaponManager extends EntityManager {
         EventManager.Instance.off(EventEnum.BulletBorn, this.handleBulletBorn, this);
     }
 
+    disenableShoot() {
+        EventManager.Instance.off(EventEnum.WeaponShoot, this.handleWeaponShoot, this);
+    }
+
     handleBulletBorn(owner: number) {
         if (owner !== this.owner) {
             return;

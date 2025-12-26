@@ -1,9 +1,9 @@
-import { _decorator, Component, instantiate, macro, Node, Prefab, SpriteFrame, view } from 'cc';
+import { _decorator, Component, director, instantiate, macro, Node, Prefab, SpriteFrame, view } from 'cc';
 import DataManager from '../Global/DataManager';
 import { joyStickManager } from '../UI/joyStickManager';
 import { ResourceManager } from '../Global/ResourceManager';
 import { ActorManager } from '../Entity/Actor/ActorManager';
-import { EventEnum, PrefabPathEnum, TexturePathEnum } from '../Enum/Enum';
+import { EventEnum, PrefabPathEnum, SceneEnum, TexturePathEnum } from '../Enum/Enum';
 
 import { ApiMsgEnum, EntityTypeEnum, InputTypeEnum } from '../Common/Enum';
 import { IClientInput, ITimePast } from '../Common/State';
@@ -23,11 +23,13 @@ export class BattleManager extends Component {
     private ui: Node = null;
     private isLoadFinish: boolean = false;
     private isRanderMap: boolean = false;
+    private isPlayersCount: boolean = false;
+    private isUserGG: boolean = false;
 
     /**
      * 本地同步缓存
      */
-    private pendingMsg:IMsgClientSync[] = [];
+    private pendingMsg: IMsgClientSync[] = [];
 
     protected onLoad(): void {
         //设置横屏
@@ -35,13 +37,24 @@ export class BattleManager extends Component {
     }
     private gameClear() {
         EventManager.Instance.off(EventEnum.ClintSync, this.clientSyncHandle, this);
+        EventManager.Instance.off(EventEnum.PlayerGG, this.playerLossHandle, this);
         NetworkManager.Instance.unlistenMsg(ApiMsgEnum.MsgServerSync, this.serverSyncHandle, this);
+
         this.setLandscape();
         DataManager.Instance.stage = this.stage = this.node.getChildByName("Stage");
         this.ui = this.node.getChildByName("UI");
 
         //去除场景测试使用的子节点
         this.stage.destroyAllChildren();
+        //关闭失败面板
+        this.lossPannanlOnShow(false);
+        DataManager.Instance.roomInfo = null;
+        DataManager.Instance.actorMap.clear();
+        DataManager.Instance.bulletMap.clear();
+
+        this.pendingMsg = [];
+
+        ObjectPoolManager.clear();
     }
 
     private gameInit() {
@@ -49,6 +62,7 @@ export class BattleManager extends Component {
         this.isLoadFinish = true;
         //绑定事件回调
         EventManager.Instance.on(EventEnum.ClintSync, this.clientSyncHandle, this);
+        EventManager.Instance.on(EventEnum.PlayerGG, this.playerLossHandle, this);
         NetworkManager.Instance.listenMsg(ApiMsgEnum.MsgServerSync, this.serverSyncHandle, this);
     }
     async start() {
@@ -60,6 +74,14 @@ export class BattleManager extends Component {
         //连接服务器获取id
         this.gameInit();
 
+    }
+
+    protected onDestroy(): void {
+        EventManager.Instance.off(EventEnum.ClintSync, this.clientSyncHandle, this);
+        EventManager.Instance.off(EventEnum.PlayerGG, this.playerLossHandle, this);
+        NetworkManager.Instance.unlistenMsg(ApiMsgEnum.MsgServerSync, this.serverSyncHandle, this);
+        this.pendingMsg = [];
+        ObjectPoolManager.clear();
     }
 
 
@@ -76,9 +98,11 @@ export class BattleManager extends Component {
             console.log("资源未加载完成/网络异常");
             return;
         }
+        if (this.isUserGG) {
+            return;
+        }
         this.rander(deltaTime);
         this.tick(deltaTime);
-
     }
 
     //设置为横屏
@@ -133,6 +157,7 @@ export class BattleManager extends Component {
     }
     //#region [rander]
     rander(deltaTime: number) {
+
         //渲染顺序决定覆盖关系
         this.randerMap();
         this.randerActor();
@@ -153,6 +178,11 @@ export class BattleManager extends Component {
             } else {
                 actCp.rander(actorInfo);
             }
+        }
+        if (this.isPlayersCount === false) {
+            DataManager.Instance.roomPlayers = DataManager.Instance.actorMap.size;
+            console.log("房间人数->", DataManager.Instance.roomPlayers);
+            this.isPlayersCount = true;
         }
 
     }
@@ -201,7 +231,7 @@ export class BattleManager extends Component {
             frameId: DataManager.Instance.frameId++,
         }
         NetworkManager.Instance.sendMsg(ApiMsgEnum.MsgClientSync, msg);
-        if(input.type === InputTypeEnum.ActorMove){
+        if (input.type === InputTypeEnum.ActorMove) {
             DataManager.Instance.applyInput(input);
             this.pendingMsg.push(msg);
         }
@@ -227,6 +257,78 @@ export class BattleManager extends Component {
             DataManager.Instance.applyInput(msg.input);
         }
     }
+    //#endregion
+
+    //#region 战斗结算处理
+    lossPannanlOnShow(isShow: boolean) {
+        this.node.getChildByPath("UI/loss").active = isShow;
+    }
+
+    async returnHallBtnOnClick() {
+        const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiRoomLeave, {});
+        if (!success) {
+            console.log(error);
+            return;
+        }
+        ObjectPoolManager.clear();
+        director.loadScene(SceneEnum.Hall);
+        DataManager.Instance.roomInfo = null;
+        DataManager.Instance.actorMap.clear();
+        DataManager.Instance.bulletMap.clear();
+    }
+
+    async successHandle() {
+        const { success, res, error } = await NetworkManager.Instance.callApi(ApiMsgEnum.ApiRoomLeave, {});
+        if (!success) {
+            console.log(error);
+            return;
+        }
+        //禁止本机射击，避免子弹节点被销毁，动画还在播放
+        DataManager.Instance.actorMap.get(DataManager.Instance.playerId).disableWeapon();
+        //删除场上所有子弹
+        ObjectPoolManager.clear();
+        director.loadScene(SceneEnum.Hall);
+        DataManager.Instance.roomInfo = null;
+        DataManager.Instance.actorMap.clear();
+        DataManager.Instance.bulletMap.clear();
+
+    }
+
+    /**
+     * 某个玩家失败处理
+     */
+    async playerLossHandle(userId: number) {
+        //判断是不是机主
+        if (DataManager.Instance.playerId === userId) {
+            this.isUserGG = true;
+            this.lossPannanlOnShow(true);
+            //关闭失败处理事件防止误判
+            EventManager.Instance.off(EventEnum.PlayerGG, this.playerLossHandle, this);
+        }
+        //踢出渲染map和state,使其不再参与交互
+        DataManager.Instance.state.actors = DataManager.Instance.state.actors.filter(actor => actor.userId !== userId);
+        // DataManager.Instance.state.bullets = DataManager.Instance.state.bullets.filter(bullet => bullet.owner !== userId);
+        const actCp = DataManager.Instance.actorMap.get(userId);
+        // DataManager.Instance.actorMap.delete(userId);
+        DataManager.Instance.roomPlayers--;
+
+        //延迟0.5s失能角色
+        this.scheduleOnce(() => {
+            //可加消散特效
+            actCp.node.active = false;
+
+        }, 0.5);
+        //判断当前玩家数，若<=1,则还剩下胜利者
+        if (DataManager.Instance.roomPlayers <= 1 && DataManager.Instance.playerId !== userId) {
+            //TODO:胜利逻辑
+            this.scheduleOnce(() => {
+
+                this.successHandle();
+            }, 2);
+
+        }
+    }
+
     //#endregion
 }
 

@@ -16,8 +16,7 @@ export enum EventEnum {
   ClintSync = "ClintSync",
   RoomSelect = "RoomSelect",//高亮点击的房间列表
   RoomJoin = "RoomJoin",    //点击加入房间按钮后
-  
-
+  PlayerGG = "PlayerGG",    //玩家GG
 }
 
 export enum PrefabPathEnum {

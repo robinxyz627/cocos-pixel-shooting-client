@@ -34,6 +34,10 @@ export default class DataManager extends Singleton {
    */
   roomInfo: IRoom = null;
   /**
+   * 房间剩余玩家数
+   */
+  roomPlayers: number = -1;
+  /**
    * 玩家 joyStickManager引用
    */
   jsm: joyStickManager = null;
@@ -174,6 +178,10 @@ export default class DataManager extends Singleton {
       for (let j = actors.length - 1; j >= 0; j--) {
         const actor = actors[j];
         if (actor.userId === bullet.owner) continue;//忽略自己
+        //新增角色出局不判断
+        if (DataManager.Instance.actorMap.get(actor.userId).GG){
+          continue;
+        }
         if (Vec2.distance(bullet.position, actor.position) < COLLIDER_DISTANCE) {
           //击中目标
           EventManager.dispatch(EventEnum.ExplosionBorn, bullet.id,

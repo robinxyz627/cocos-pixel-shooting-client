@@ -44,6 +44,18 @@ export class ObjectPoolManager extends Singleton {
         node.active = false;
         ObjectPoolManager.Instance.objectPool.get(node.name as EntityTypeEnum).push(node);
     }
+
+    public static clear() {
+        ObjectPoolManager.Instance.objectPool.forEach((value, key) => {
+            value.forEach(node => {
+                if (node.isValid) {
+                    node.destroy();
+                }
+            });
+        });
+        ObjectPoolManager.Instance.objectPoolNode = null;//下次使用对象池重新创建节点
+        ObjectPoolManager.Instance.objectPool.clear();
+    }
 }
 
 

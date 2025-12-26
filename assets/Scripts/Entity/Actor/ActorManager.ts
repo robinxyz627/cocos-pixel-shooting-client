@@ -22,6 +22,8 @@ export class ActorManager extends EntityManager {
 
     //血条progress
     private hp: ProgressBar = null;
+    private isGG: boolean = false;
+
     private feedDogCounter: number = 0;
 
     private targetPos: Vec3;
@@ -46,6 +48,7 @@ export class ActorManager extends EntityManager {
         this.id = data.userId;
         this.weaponType = data.weaponType;
         this.hp = this.node.getChildByName("HP").getComponent(ProgressBar);
+        this.isGG = false;
 
         if (data.type === EntityTypeEnum.Skeleton) {
             this.initSkeleton(data);
@@ -72,7 +75,10 @@ export class ActorManager extends EntityManager {
         this._sk = this.node.getComponent(sp.Skeleton);
 
         //TODO获取贴图（贴图需要发给服务器，如此客户端才能互相看到，从map中通过id取出，此处简易实现）
-        this._sk.setSlotTexture("actorModel", DataManager.Instance.userTexture);
+        //目前仅支持本机自娱自乐,别人看就是原画
+        if (data.userId === DataManager.Instance.playerId && DataManager.Instance.userTexture) {
+            this._sk.setSlotTexture("actorModel", DataManager.Instance.userTexture);
+        }
 
         this.setState(data, EntityStateEnum.Idle);
         this._sk.invalidAnimationCache();
@@ -90,6 +96,13 @@ export class ActorManager extends EntityManager {
         this.wpm.init(data);
     }
 
+    disableWeapon() {
+        if (!this.wpm) {
+            return;
+        }
+        this.wpm.disenableShoot();
+    }
+
     /**
      * 动画机状态切换(兼容骨骼动画)
      * 骨骼动画名称小写⭐
@@ -104,7 +117,7 @@ export class ActorManager extends EntityManager {
                 return;
             }
             this._skLastState = animState;
-            this._sk.setAnimation(0, toLowerCase(animState), true);        
+            this._sk.setAnimation(0, toLowerCase(animState), true);
         } else {
             this.state = animState;
         }
@@ -151,6 +164,10 @@ export class ActorManager extends EntityManager {
     feedDog() {
         this.feedDogCounter = 0.5; //持续0.5秒
     }
+
+    get GG() {
+        return this.isGG;
+    }
     /**
      * 角色逐帧渲染
      * IActor {
@@ -161,6 +178,9 @@ export class ActorManager extends EntityManager {
      * }
      */
     rander(data: IActor) {
+        if (this.isGG && data.userId === this.id)
+            //gg的角色不渲染
+            return;
         this.randerPos(data);
         this.randerDir(data);
         this.randerHp(data);
@@ -211,6 +231,11 @@ export class ActorManager extends EntityManager {
     randerHp(data: IActor) {
         //设置血量
         this.hp.progress = data.hp / this.hp.totalLength;
+        //没血事件
+        if (this.hp.progress <= 0) {
+            this.isGG = true;
+            EventManager.dispatch(EventEnum.PlayerGG, data.userId);
+        }
     }
 }
 

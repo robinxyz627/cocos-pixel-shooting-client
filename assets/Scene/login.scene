@@ -196,7 +196,7 @@
     "_priority": 10,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 448.3694083694084,
+    "_orthoHeight": 433.05923344947735,
     "_near": 0,
     "_far": 2000,
     "_color": {
@@ -762,7 +762,7 @@
     "_string": "请输入昵称",
     "_horizontalAlign": 0,
     "_verticalAlign": 1,
-    "_actualFontSize": 21.65625,
+    "_actualFontSize": 22.421875,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1042,7 +1042,7 @@
     "_string": "登陆",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 21.65625,
+    "_actualFontSize": 22.421875,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1917,7 +1917,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 191.9445571789322,
+      "width": 191.95535714285714,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -1950,7 +1950,7 @@
     "_string": "不行，我要自己画",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 25.987499999999997,
+    "_actualFontSize": 26.90625,
     "_fontSize": 24,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
